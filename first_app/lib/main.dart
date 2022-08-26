@@ -14,7 +14,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'IS381 Demo Home Page'),
+      initialRoute: '/1',
+      routes: {
+        '/': (context) => const MyHomePage(title: 'Home'),
+        '/1': (context) => FirstPage(),
+        '/2': (context) => SecondPage(),
+        '/3': (context) => ThirdPage(),
+      },
     );
   }
 }
@@ -30,6 +36,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  String _image = 'images/logo-small.png';
 
   void _incrementCounter() {
     setState(() {
@@ -43,33 +50,73 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-            Text('My first text'),
-            ElevatedButton(
-              onPressed: () {
-                _counter += 1;
-              },
-              child: Text('Add'),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                MyButton(),
-                MyButton(),
-              ],
-            ),
-            MyDynamicButton(),
-          ],
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(bottom: 100.0),
+                padding: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                child: Image.asset(
+                  _image,
+                  height: 200,
+                ),
+              ),
+              const Text(
+                'You have pushed the button this many times:',
+              ),
+              Text(
+                '$_counter',
+                style: Theme.of(context).textTheme.headline4,
+              ),
+              Text('My first text'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _counter--;
+                        _image = 'images/sad.png';
+                      });
+                    },
+                    child: Text('-'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _counter = 0;
+                        _image = 'images/logo-small.png';
+                      });
+                    },
+                    child: Text('reset'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _counter++;
+                        _image = 'images/smile.png';
+                      });
+                    },
+                    child: Text('+'),
+                  ),
+                ],
+              ),
+              MyDynamicButton(),
+              MyButton(),
+              MyButton(),
+              MyButton(),
+              MyButton(),
+              MyButton(),
+              MyButton(),
+              MyButton(),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -108,6 +155,66 @@ class _MyDynamicButtonState extends State<MyDynamicButton> {
         });
       },
       child: Text('$_counter'),
+    );
+  }
+}
+
+class FirstPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Page 1'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Hello'),
+                ),
+              );
+            },
+            icon: const Icon(Icons.tiktok),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/2');
+            },
+            icon: const Icon(Icons.forward),
+          ),
+        ],
+      ),
+      body: const Center(
+        child: Text('Page 1'),
+      ),
+    );
+  }
+}
+
+class SecondPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Page 2'),
+      ),
+      body: const Center(
+        child: Text('Page 2'),
+      ),
+    );
+  }
+}
+
+class ThirdPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Page 3'),
+      ),
+      body: const Center(
+        child: Text('Page 3'),
+      ),
     );
   }
 }
