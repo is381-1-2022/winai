@@ -1,7 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'pages/fifth_page.dart';
+import 'pages/first_page.dart';
+import 'pages/fourth_page.dart';
+import 'pages/second_page.dart';
+import 'pages/third_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => FoodPreferenceModel()),
+      ChangeNotifierProvider(create: (context) => LoginProfileModel()),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -21,6 +34,7 @@ class MyApp extends StatelessWidget {
         '/2': (context) => SecondPage(),
         '/3': (context) => ThirdPage(),
         '/4': (context) => FourthPage(),
+        '/5': (context) => FifthPage(),
       },
     );
   }
@@ -156,173 +170,6 @@ class _MyDynamicButtonState extends State<MyDynamicButton> {
         });
       },
       child: Text('$_counter'),
-    );
-  }
-}
-
-class FirstPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Page 1'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Hello'),
-                ),
-              );
-            },
-            icon: const Icon(Icons.tiktok),
-          ),
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/2');
-            },
-            icon: const Icon(Icons.forward),
-          ),
-        ],
-      ),
-      body: GridView.count(
-        crossAxisCount: 2,
-        children: List.generate(5, (index) {
-          return InkWell(
-            onTap: () {
-              if (index < 2) {
-                return;
-              }
-
-              Navigator.pushNamed(context, '/$index');
-            },
-            child: Container(
-              margin: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.70),
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Center(
-                child: Text('Page $index'),
-              ),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-}
-
-class SecondPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    List<String> entries = <String>['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-    List<int> colorCodes = <int>[700, 500, 300, 700, 500, 300, 700];
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Page 2'),
-      ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(8.0),
-        itemCount: entries.length,
-        itemBuilder: (context, index) {
-          return Container(
-            height: 100,
-            color: Colors.amber[colorCodes[index]],
-            child: Center(
-              child: InkWell(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Hello ${entries[index]}'),
-                    ),
-                  );
-                },
-                child: Text('Entry ${entries[index]}'),
-              ),
-            ),
-          );
-        },
-        separatorBuilder: (context, index) => const Divider(),
-      ),
-    );
-  }
-}
-
-class ThirdPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Page 3'),
-      ),
-      body: MyForm(),
-    );
-  }
-}
-
-class MyForm extends StatefulWidget {
-  @override
-  State<MyForm> createState() => _MyFormState();
-}
-
-class _MyFormState extends State<MyForm> {
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Enter your name:'),
-          TextFormField(
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your name';
-              }
-
-              if (value.length < 5) {
-                return 'Your name must be at least 5 charactors';
-              }
-
-              return null;
-            },
-          ),
-          Divider(),
-          Text('Enter your age:'),
-          TextFormField(),
-          Divider(),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('All done'),
-                  ),
-                );
-              }
-            },
-            child: Text('Validate'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class FourthPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Page 4'),
-      ),
-      body: const Center(
-        child: Text('Blank page'),
-      ),
     );
   }
 }
