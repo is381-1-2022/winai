@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,6 +27,8 @@ class _MyFormState extends State<MyForm> {
   late String _name;
   late int _age;
   late String _password;
+
+  String _message = "";
 
   @override
   Widget build(BuildContext context) {
@@ -125,8 +128,13 @@ class _MyFormState extends State<MyForm> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
+            child: Text('Message : $_message',
+                style: TextStyle(color: Color(Colors.red.value))),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
 
@@ -134,6 +142,31 @@ class _MyFormState extends State<MyForm> {
                     ..name = _name
                     ..age = _age
                     ..password = _password;
+
+                  try {
+                    final credential = await FirebaseAuth.instance
+                        .createUserWithEmailAndPassword(
+                      email: _name,
+                      password: _password,
+                    );
+                  } on FirebaseAuthException catch (e) {
+                    if (e.code == 'weak-password') {
+                      print('The password provided is too weak.');
+                      setState(() {
+                        _message = 'The password provided is too weak.';
+                      });
+                    } else if (e.code == 'email-already-in-use') {
+                      print('The account already exists for that email.');
+                      setState(() {
+                        _message = 'The account already exists for that email.';
+                      });
+                    }
+
+                    return;
+                  } catch (e) {
+                    print(e);
+                    return;
+                  }
 
                   Navigator.push(
                     context,
@@ -145,8 +178,44 @@ class _MyFormState extends State<MyForm> {
                   );
                 }
               },
-              child: Text('Validate & Save'),
+              child: Text('Add User'),
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+
+                    context.read<LoginProfileModel>()
+                      ..name = _name
+                      ..age = _age
+                      ..password = _password;
+
+                    try {
+                      final credential = await FirebaseAuth.instance
+                          .signInWithEmailAndPassword(
+                              email: _name, password: _password);
+                      setState(() {
+                        _message = 'Login sucessfully';
+                      });
+                    } on FirebaseAuthException catch (e) {
+                      if (e.code == 'user-not-found') {
+                        print('No user found for that email.');
+                        setState(() {
+                          _message = 'No user found for that email.';
+                        });
+                      } else if (e.code == 'wrong-password') {
+                        print('Wrong password provided for that user.');
+                        setState(() {
+                          _message = 'Wrong password provided for that user.';
+                        });
+                      }
+                    }
+                  }
+                },
+                child: Text('Login')),
           ),
         ],
       ),
